@@ -40,6 +40,29 @@ function mostrarDialogoNuevaContrasena() {
     document.getElementById('nueva-contrasena').focus();
 }
 
+// Explica por qué no se pudo enviar el código: casi nunca es culpa del correo
+function textoErrorEnvioCodigo(error) {
+    const mensaje = error.message || '';
+    const espera = /after (\d+) seconds?/i.exec(mensaje);
+
+    if (espera) {
+        return `Ya has pedido un código hace poco. Podrás pedir otro en ${espera[1]} segundos.`;
+    }
+    if (error.status === 429 || /rate_limit/.test(error.code || '')) {
+        return 'Se han enviado demasiados correos. Tu dirección no es el problema: espera una hora y vuelve a intentarlo.';
+    }
+    if (error.code === 'email_address_not_authorized') {
+        return 'El servicio de correo de la web todavía no puede enviar mensajes a esta dirección.';
+    }
+    if (error.code === 'email_address_invalid' || error.code === 'validation_failed') {
+        return 'El correo no es válido. Comprueba que está bien escrito.';
+    }
+    if (error.name === 'AuthRetryableFetchError' && !error.status) {
+        return 'No hay conexión con el servidor. Comprueba tu conexión a internet e inténtalo de nuevo.';
+    }
+    return 'No se pudo enviar el código por un fallo del servicio de correo. Inténtalo de nuevo más tarde.';
+}
+
 async function procesarRecuperacion(evento) {
     evento.preventDefault();
 
@@ -91,7 +114,7 @@ async function procesarRecuperacion(evento) {
             'mensaje-recuperar-contrasena',
             codigoRecuperacionEnviado
                 ? 'El código no es válido o ha caducado. Compruébalo e inténtalo de nuevo.'
-                : 'No se pudo enviar el código. Comprueba la dirección e inténtalo de nuevo más tarde.'
+                : textoErrorEnvioCodigo(error)
         );
     } finally {
         boton.disabled = false;
