@@ -133,7 +133,7 @@ insertarDialogo('menu-movil', `
       <ul class="menu-movil-lista">
         <li>
           <button type="button" class="menu-movil-opcion" onclick="opcionMenuMovil('modal-acce-mas')">
-            <img src="${ATLAS_COMPARTIDO}svg/accesibilidad/acces.svg" alt="" class="menu-movil-icono">
+            <img src="${ATLAS_COMPARTIDO}svg/accesibilidad/silla.svg" alt="" class="menu-movil-icono">
             <span>Menú de accesibilidad</span>
           </button>
         </li>

@@ -21,7 +21,7 @@ function resetearFormularioDOM(sufijo) {
     const imgN1 = document.getElementById(`icono-elegido-n1${sufijo}`);
     const imgN2 = document.getElementById(`icono-elegido-n2${sufijo}`);
 
-    if (btnN1) btnN1.innerText = "No seleccionada";
+    if (btnN1) { btnN1.innerText = "No seleccionada"; delete btnN1.dataset.nombre; }
     if (btnN2) btnN2.innerText = "No seleccionada";
     
     if (imgN1) { imgN1.src = ""; imgN1.style.display = "none"; }
@@ -73,7 +73,8 @@ function abrirModalNivel2(sufijo = window.formularioActivoActual || '') {
 function seleccionarCatenivel1(boton) {
     const sufijo = window.formularioActivoActual || '';
     mostrarAvisoCategoria(sufijo, '');
-    const nuevoTexto = boton.querySelector('.btn-cate-txt').innerText.trim();
+    const textoVisible = boton.querySelector('.btn-cate-txt').innerText.trim();
+    const nuevoTexto = boton.dataset.nombre || textoVisible; // nombre que se guarda
     const textoAnterior = localStorage.getItem(`categoriaGuardadaNombre${sufijo}`);
 
     // Si la categoría cambia, borramos la subcategoría seleccionada.
@@ -92,7 +93,7 @@ function seleccionarCatenivel1(boton) {
     // Guardamos y actualizamos Nivel 1
     localStorage.setItem(`categoriaGuardadaNombre${sufijo}`, nuevoTexto);
     const btnN1 = document.getElementById(`valor-n1${sufijo}`);
-    if (btnN1) btnN1.innerText = nuevoTexto;
+    if (btnN1) { btnN1.innerText = textoVisible; btnN1.dataset.nombre = nuevoTexto; }
 
     // MAGIA DE LA IMAGEN (Nivel 1)
     const imgElement = boton.querySelector('img');

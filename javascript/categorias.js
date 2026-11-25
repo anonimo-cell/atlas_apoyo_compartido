@@ -4,7 +4,15 @@
 // =========================================================================
 const CATE_OTROS = { nombre: 'Otros', icono: 'otros.svg' };
 
-const esDeLaWeb = (cate, web) => !cate.webs || cate.webs.includes(web);
+// Texto que se ve (la etiqueta si la tiene; si no, el nombre)
+const textoDe = cate => cate.etiqueta || cate.nombre;
+
+// Nombre guardado de un botón o del valor elegido en el formulario
+const nombreDe = elemento => (elemento.dataset.nombre || elemento.textContent).trim();
+
+// Sin "webs": en todas. Con "excepto": en todas menos esas.
+const esDeLaWeb = (cate, web) =>
+    (!cate.webs || cate.webs.includes(web)) && !(cate.excepto || []).includes(web);
 
 // Subcategorías de una categoría en una web, con "Otros" al final
 const subcategoriasDe = (cate, web) =>
@@ -25,8 +33,8 @@ function categoriaExisteEnWeb(nombre1, nombre2, web) {
 function botonCategoria(cate, funcion, total, datos = '') {
     // Con muchas categorías se usan los botones pequeños
     return `
-      <button type="button" class="${total > 6 ? 'btn-cate-4' : 'btn-cate'}" ${datos} onclick="${funcion}(this)">
-        <span class="btn-cate-txt">${cate.nombre}</span>
+      <button type="button" class="${total > 6 ? 'btn-cate-4' : 'btn-cate'}" data-nombre="${cate.nombre}" ${datos} onclick="${funcion}(this)">
+        <span class="btn-cate-txt">${textoDe(cate)}</span>
         <img loading="lazy" decoding="async" src="${ATLAS_COMPARTIDO}svg/cate/${cate.icono}" class="cap-icon-cate" alt="">
       </button>`;
 }
@@ -46,14 +54,14 @@ function pintarPaginasCategorias() {
 function paginaCategoria(cate) {
     const subs = subcategoriasDe(cate, ATLAS.discapacidad);
     return `
-    <div id="vista-${cate.id}" class="subvista-contenido" style="display: none;">
+    <div id="vista-${cate.id}" data-cate1="${cate.nombre}" class="subvista-contenido" style="display: none;">
       <div class="contenedor-dinamico">
         <div class="linea_superior">
           <div class="grid-linea-superior">
             <nav class="migas-pan" aria-label="Ruta de navegación">
               <span class="miga-enlace" onclick="regresarvolver(1)">Ver Productos</span>
               <span class="miga-separador">&rarr;</span>
-              <span class="miga-actual">${cate.nombre}</span>
+              <span class="miga-actual">${textoDe(cate)}</span>
             </nav>
             <button type="button" class="btn-volver" onclick="regresarvolver(1)">
               <span class="cabecera-linea-volver">
@@ -64,7 +72,7 @@ function paginaCategoria(cate) {
             <div class="cabecera-superior-icono">
               <img loading="lazy" decoding="async" src="${ATLAS_COMPARTIDO}svg/cate/${cate.icono}" class="cap-icon-linea-superior" alt="">
               <div class="text-linea-superior">
-                <h1 class="titulo-linea-superior">${cate.nombre}</h1>
+                <h1 class="titulo-linea-superior">${textoDe(cate)}</h1>
               </div>
             </div>
             <div class="caja-contenedor-busqueda" role="search">
@@ -105,7 +113,7 @@ function abrirSubcategorias(nombre) {
     if (!cate) return;
 
     const subs = subcategoriasDe(cate, ATLAS.discapacidad);
-    document.getElementById('titulo-modal-categorias2').textContent = cate.nombre;
+    document.getElementById('titulo-modal-categorias2').textContent = textoDe(cate);
     document.querySelector('#modal-categorias2 .grid-capsulas').innerHTML =
         subs.map(sub => botonCategoria(sub, 'seleccionarCategoria2', subs.length)).join('');
     abrirModal('modal-categorias2');
@@ -129,7 +137,7 @@ function actualizarDiscapacidades(sufijo) {
 
     const elegida = nivel => {
         const boton = document.getElementById(`valor-${nivel}${sufijo}`);
-        const texto = boton ? boton.textContent.trim() : '';
+        const texto = boton ? nombreDe(boton) : '';
         return texto === 'No seleccionada' ? '' : texto;
     };
     const cate1 = elegida('n1');

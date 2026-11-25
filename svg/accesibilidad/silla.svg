@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Símbolo de accesibilidad: persona en silla de ruedas -->
+  <circle cx="266" cy="92" r="34" fill="#000"/>
+  <g fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M262 175v115h75l70 72" stroke-width="58"/>
+    <path d="M262 215h78" stroke-width="30"/>
+    <path d="M198 192A118 118 0 1 0 326 360" stroke-width="40"/>
+  </g>
+</svg>

@@ -321,7 +321,7 @@ async function validarYPublicar(elemento) {
 
         // <-- NUEVO: Recoger Categoría 1 y 2 para Bajo Coste
         const spanNivel1 = vistaActual.querySelector('#valor-n1');
-        const categoria1Final = spanNivel1 ? spanNivel1.textContent.trim() : "Sin categoría";
+        const categoria1Final = spanNivel1 ? nombreDe(spanNivel1) : "Sin categoría";
 
         const spanNivel2 = vistaActual.querySelector('#valor-n2');
         const categoria2Final = spanNivel2 ? spanNivel2.textContent.trim() : "Sin categoría";
@@ -405,7 +405,7 @@ async function validarYPublicar(elemento) {
 
         // <-- NUEVO: Recoger Categoría 1 y 2 para Comercializado
         const spanNivel1Com = document.getElementById('valor-n1-com');
-        const categoria1Final = spanNivel1Com ? spanNivel1Com.textContent.trim() : "Sin categoría";
+        const categoria1Final = spanNivel1Com ? nombreDe(spanNivel1Com) : "Sin categoría";
 
         const spanNivel2Com = document.getElementById('valor-n2-com');
         const categoria2Final = spanNivel2Com ? spanNivel2Com.textContent.trim() : "Sin categoría";
@@ -733,7 +733,8 @@ async function ejecutarBusquedaTexto(event, inputElement) {
         let textoMiga = "Búsqueda global";
 
         if (tituloVista && tituloVista.toLowerCase() !== "ver productos" && tituloVista.toLowerCase() !== "cargando...") {
-            const categoriaVista = encodeURIComponent(`*${tituloVista}*`);
+            // En las páginas de categoría se busca por su nombre guardado (no por el texto que se ve)
+            const categoriaVista = encodeURIComponent(`*${(vistaActual && vistaActual.dataset.cate1) || tituloVista}*`);
             url += `&or=(categoria1.ilike.${categoriaVista},categoria2.ilike.${categoriaVista})`;
             textoMiga = `Búsqueda en ${tituloVista}`;
         }

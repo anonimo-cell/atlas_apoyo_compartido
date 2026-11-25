@@ -786,6 +786,10 @@ function rutaDeProducto(prod) {
 }
 
 async function actualizarCategoriasVisibles() {
+    // Una web puede pedir en su config.js que se vean todas las categorías
+    // aunque aún no tengan productos (útil en las webs nuevas)
+    if (ATLAS.mostrarCategoriasVacias) return;
+
     let productos;
     try {
         const respuesta = await fetch(`${SUPABASE_URL}/rest/v1/catalogo_productos?select=categoria1,categoria2&${FILTRO_DISCAPACIDAD}`, {
@@ -825,27 +829,13 @@ async function actualizarCategoriasVisibles() {
             const texto = boton.querySelector('.btn-cate-txt');
             if (!texto) return;
 
-            const rutaBoton = [...ruta, normalizarCategoria(texto.innerText)];
+            const rutaBoton = [...ruta, normalizarCategoria(boton.dataset.nombre || texto.innerText)];
             const tieneProductos = rutasConProductos.has(rutaBoton.join(' › '));
             boton.style.display = tieneProductos ? '' : 'none';
 
             const subvista = boton.getAttribute('data-vista');
             if (subvista) pendientes.push({ vista: document.getElementById(subvista), ruta: rutaBoton });
         });
-
-        // Si no queda ninguna categoría visible, lo decimos en lugar de dejar la pantalla vacía
-        const rejilla = vista.querySelector('.categorias .grid-capsulas');
-        if (rejilla) {
-            let aviso = vista.querySelector('.aviso-sin-categorias');
-            const hayVisibles = Array.from(botones).some(b => b.style.display !== 'none');
-            if (!hayVisibles && !aviso) {
-                aviso = document.createElement('p');
-                aviso.className = 'mensaje-catalogo aviso-sin-categorias';
-                aviso.innerText = 'Todavía no hay productos en esta categoría.';
-                rejilla.after(aviso);
-            }
-            if (aviso) aviso.style.display = hayVisibles ? 'none' : '';
-        }
     }
 }
 

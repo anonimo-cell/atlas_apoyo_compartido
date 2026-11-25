@@ -4824,7 +4824,7 @@ img[role="button"] {
    ========================================================================= */
 @media (min-width: 1280px) {
   :root {
-    --ancho-lateral: 100px; /* la columna derecha solo lleva iconos */
+    --ancho-lateral: 130px; /* la columna derecha: iconos y la palabra "Accesibilidad" */
   }
 
   .parent {
@@ -7727,4 +7727,43 @@ textarea,
 .ayuda-precio {
   margin: 6px 0 0;
   font-size: 0.95rem;
+}
+
+/* Botón lateral de accesibilidad: en ordenador, la palabra "Accesibilidad"
+   con el símbolo de la silla de ruedas debajo, en lugar del icono (en el
+   móvil, donde ya se ve el nombre, sigue el icono).
+   El lector de pantalla lee el nombre del botón, "Menú de accesibilidad". */
+.pila-acce-lateral {
+  display: none;
+}
+@media (min-width: 1280px) {
+  .lateral_izq .icono-acce-lateral {
+    display: none !important;
+  }
+  .lateral_izq .pila-acce-lateral {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .lateral_izq .txt-acce-lateral {
+    font-size: 0.9rem;
+    font-weight: 700;
+    line-height: 1.1;
+    color: inherit;
+    white-space: nowrap;
+  }
+  .lateral_izq .icono-silla-lateral {
+    width: 40px;
+    height: 40px;
+  }
+  .lateral_izq .side-btn-dech:has(.pila-acce-lateral):not(:hover):not(:focus-visible) {
+    padding-left: 6px;
+    padding-right: 4px;
+  }
+  /* Al pasar el ratón ya aparece "Menú de accesibilidad": no repetimos la palabra */
+  .lateral_izq .side-btn-dech:hover .txt-acce-lateral,
+  .lateral_izq .side-btn-dech:focus-visible .txt-acce-lateral {
+    display: none;
+  }
 }
