@@ -188,7 +188,8 @@ function revisarVistaVisible() {
 
     const encabezado = vista.querySelector('h1');
     const textoEncabezado = encabezado ? encabezado.textContent.trim() : '';
-    const nuevoTitulo = textoEncabezado ? `${textoEncabezado} · Atlas de apoyo Parkinson` : 'Atlas de apoyo Parkinson';
+    const nombreWeb = `Atlas de apoyo ${window.ATLAS ? window.ATLAS.nombre : 'Parkinson'}`;
+    const nuevoTitulo = textoEncabezado ? `${textoEncabezado} · ${nombreWeb}` : nombreWeb;
     if (document.title !== nuevoTitulo) document.title = nuevoTitulo;
 
     if (vista.id === idVistaAnterior) return;
