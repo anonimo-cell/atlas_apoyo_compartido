@@ -442,11 +442,21 @@ const filtrosCatalogo = { precio: new Set(), dificultad: new Set(), tiempo: new 
 
 const normalizarFiltro = texto => (texto || '').toString().trim().toLowerCase();
 
+// Los comercializados guardan el precio en euros ("25 €"); los de bajo coste
+// y los antiguos, "Bajo", "Medio" o "Alto". Para filtrar, los euros se
+// cuentan como Bajo (hasta 20 €), Medio (de 20 a 50 €) o Alto (más de 50 €).
+function nivelDePrecio(precio) {
+    const euros = leerPrecioEuros(precio);
+    if (euros === null) return normalizarFiltro(precio);
+    return euros <= 20 ? 'bajo' : euros <= 50 ? 'medio' : 'alto';
+}
+
 function cumpleFiltros(prod) {
     const grupos = tipoFiltroGlobal == 1 ? ['precio'] : ['precio', 'dificultad', 'tiempo'];
     return grupos.every(grupo => {
         const elegidos = filtrosCatalogo[grupo];
-        return elegidos.size === 0 || elegidos.has(normalizarFiltro(prod[grupo]));
+        const valor = grupo === 'precio' ? nivelDePrecio(prod.precio) : normalizarFiltro(prod[grupo]);
+        return elegidos.size === 0 || elegidos.has(valor);
     });
 }
 

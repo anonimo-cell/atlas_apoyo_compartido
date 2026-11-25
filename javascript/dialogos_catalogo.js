@@ -303,17 +303,14 @@ insertarDialogo('modal-dificultad', `
     <div class="grid-capsulas">
       <button type="button" class="btn-cate" onclick="seleccionarDificultad(this)">
         <span class="txt-filtro">Fácil</span>
-        <span class="txt-filtro-ayuda">Sin herramientas</span>
         <img loading="lazy" decoding="async" src="${ATLAS_COMPARTIDO}svg/filtro/bajo.svg" class="cap-icon-cate" alt="">
       </button>
       <button type="button" class="btn-cate" onclick="seleccionarDificultad(this)">
         <span class="txt-filtro">Medio</span>
-        <span class="txt-filtro-ayuda">Con herramientas sencillas</span>
         <img loading="lazy" decoding="async" src="${ATLAS_COMPARTIDO}svg/filtro/medio.svg" class="cap-icon-cate" alt="">
       </button>
       <button type="button" class="btn-cate" onclick="seleccionarDificultad(this)">
         <span class="txt-filtro">Difícil</span>
-        <span class="txt-filtro-ayuda">Con herramientas o ayuda</span>
         <img loading="lazy" decoding="async" src="${ATLAS_COMPARTIDO}svg/filtro/alto.svg" class="cap-icon-cate" alt="">
       </button>
     </div>

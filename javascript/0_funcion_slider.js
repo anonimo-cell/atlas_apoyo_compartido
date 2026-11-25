@@ -185,27 +185,25 @@ async function validarYPublicar(elemento) {
         if (!previewImg || previewImg.style.display === 'none') registrarError(areaImagen || vistaActual, "#seccion-info");
 
         const txtDificultad = document.getElementById('valor-dificultad');
-        if (!txtDificultad || txtDificultad.innerText.toLowerCase().includes("no seleccionada")) registrarError(txtDificultad ? txtDificultad.closest('button') : vistaActual, "#seccion-filt");
+        if (!txtDificultad || txtDificultad.textContent.toLowerCase().includes("no seleccionada")) registrarError(txtDificultad ? txtDificultad.closest('button') : vistaActual, "#seccion-filt");
 
         const txtPrecio = document.getElementById('valor-precio');
-        if (!txtPrecio || txtPrecio.innerText.toLowerCase().includes("no seleccionada")) registrarError(txtPrecio ? txtPrecio.closest('button') : vistaActual, "#seccion-filt");
+        if (!txtPrecio || txtPrecio.textContent.toLowerCase().includes("no seleccionada")) registrarError(txtPrecio ? txtPrecio.closest('button') : vistaActual, "#seccion-filt");
 
         const txtN1Baj = document.getElementById('valor-n1');
-        if (!txtN1Baj || txtN1Baj.innerText.toLowerCase().includes("no seleccionada")) {
-            registrarError(txtN1Baj ? txtN1Baj.closest('button') : vistaActual, ".guia-card");
+        if (!txtN1Baj || txtN1Baj.textContent.toLowerCase().includes("no seleccionada")) {
+            registrarError(txtN1Baj ? txtN1Baj.closest('button') : vistaActual, "#seccion-cate");
         }
 
         // 2. Validar Categoría 2 (Bajo coste)
         const txtN2Baj = document.getElementById('valor-n2');
-        if (!txtN2Baj || txtN2Baj.innerText.toLowerCase().includes("no seleccionada")) {
-            registrarError(txtN2Baj ? txtN2Baj.closest('button') : vistaActual, ".guia-card");
+        if (!txtN2Baj || txtN2Baj.textContent.toLowerCase().includes("no seleccionada")) {
+            registrarError(txtN2Baj ? txtN2Baj.closest('button') : vistaActual, "#seccion-cate");
         }
 
         const txtTiempo = document.getElementById('valor-tiempo');
-        if (!txtTiempo || txtTiempo.innerText.toLowerCase().includes("no seleccionada")) registrarError(txtTiempo ? txtTiempo.closest('button') : vistaActual, "#seccion-filt");
+        if (!txtTiempo || txtTiempo.textContent.toLowerCase().includes("no seleccionada")) registrarError(txtTiempo ? txtTiempo.closest('button') : vistaActual, "#seccion-filt");
 
-        const txtN1 = document.getElementById('valor-n1');
-        if (!txtN1 || txtN1.innerText.toUpperCase().includes("no seleccionada")) registrarError(txtN1 ? txtN1.closest('button') : vistaActual, "#seccion-cate");
 
         const materialesItems = vistaActual.querySelectorAll('#lista-materiales .material-item');
         if (materialesItems.length === 0) {
@@ -250,10 +248,9 @@ async function validarYPublicar(elemento) {
         }
 
         // 2. Validar Precio Comercializado
-        const txtPrecioCom = document.getElementById('valor-precio-comercializado');
-        if (!txtPrecioCom || txtPrecioCom.innerText.toLowerCase().includes("no seleccionada")) {
-            const contenedorPrecio = vistaActual.querySelector('.contenedor-slider-filtros');
-            registrarError(contenedorPrecio || vistaActual, ".form-grid");
+        const precioCom = document.getElementById('precio-com-euros');
+        if (!precioCom || leerPrecioEuros(precioCom.value) === null) {
+            registrarError(precioCom || vistaActual, null);
         }
 
         // 3. Validar Imagen del Producto
@@ -264,24 +261,24 @@ async function validarYPublicar(elemento) {
         }
 
         // 4. Validar Descripción
-        const descripcionCom = vistaActual.querySelector('.form-row textarea');
+        const descripcionCom = document.getElementById('descripcion-com');
         if (!descripcionCom || descripcionCom.value.trim() === "") {
             registrarError(descripcionCom || vistaActual, vistaActual);
         }
 
         // 5. Validar Enlace (si lo añadiste en el paso anterior)
-        const enlaceCom = vistaActual.querySelector('.input-enlace');
+        const enlaceCom = document.getElementById('compra-com'); // "Forma de compra"
         if (enlaceCom && enlaceCom.value.trim() === "") {
             registrarError(enlaceCom, vistaActual);
         }
         const txtN1Com = document.getElementById('valor-n1-com');
-        if (!txtN1Com || txtN1Com.innerText.toLowerCase().includes("no seleccionada")) {
+        if (!txtN1Com || txtN1Com.textContent.toLowerCase().includes("no seleccionada")) {
             registrarError(txtN1Com ? txtN1Com.closest('button') : vistaActual, ".guia-card");
         }
 
         // 2. Validar Categoría 2 (Comercializado)
         const txtN2Com = document.getElementById('valor-n2-com');
-        if (!txtN2Com || txtN2Com.innerText.toLowerCase().includes("no seleccionada")) {
+        if (!txtN2Com || txtN2Com.textContent.toLowerCase().includes("no seleccionada")) {
             registrarError(txtN2Com ? txtN2Com.closest('button') : vistaActual, ".guia-card");
         }
 
@@ -292,11 +289,15 @@ async function validarYPublicar(elemento) {
     // B) SI HAY ERRORES: SCROLL AL PRIMERO Y FRENADO
     // ==========================================
     if (errores.length > 0) {
+        // Abrimos TODAS las secciones con algún campo sin rellenar, para que
+        // se vean todos los campos en rojo (no solo el primero)
+        errores.forEach(({ elemento }) => {
+            const seccion = elemento.closest('details');
+            if (seccion) seccion.open = true;
+        });
+        actualizarAvisoErrores(vistaActual);
+
         const primerError = errores[0];
-        if (primerError.acordeon) {
-            const detalles = vistaActual.querySelector(primerError.acordeon);
-            if (detalles && detalles.tagName === 'DETAILS') detalles.open = true;
-        }
         primerError.elemento.scrollIntoView({ behavior: 'smooth', block: 'center' });
         primerError.elemento.focus();
         return false; // ¡AQUÍ SE FRENA Y NO AVANZA NI ENVÍA!
@@ -312,18 +313,18 @@ async function validarYPublicar(elemento) {
         const descripcionFinal = vistaActual.querySelector('#seccion-info textarea').value.trim();
         const imgPrincipal = vistaActual.querySelector('#seccion-info .img-preview').src;
 
-        const dificultadFinal = document.getElementById('valor-dificultad').innerText;
-        const precioFinal = document.getElementById('valor-precio').innerText;
-        const tiempoFinal = document.getElementById('valor-tiempo').innerText;
+        const dificultadFinal = document.getElementById('valor-dificultad').textContent;
+        const precioFinal = document.getElementById('valor-precio').textContent;
+        const tiempoFinal = document.getElementById('valor-tiempo').textContent;
         const discapacidadFinal = Array.from(vistaActual.querySelectorAll('#tipo-discapacidad-baj input[type="checkbox"]:checked'))
             .map(input => input.value.toLowerCase());
 
         // <-- NUEVO: Recoger Categoría 1 y 2 para Bajo Coste
         const spanNivel1 = vistaActual.querySelector('#valor-n1');
-        const categoria1Final = spanNivel1 ? spanNivel1.innerText.trim() : "Sin categoría";
+        const categoria1Final = spanNivel1 ? spanNivel1.textContent.trim() : "Sin categoría";
 
         const spanNivel2 = vistaActual.querySelector('#valor-n2');
-        const categoria2Final = spanNivel2 ? spanNivel2.innerText.trim() : "Sin categoría";
+        const categoria2Final = spanNivel2 ? spanNivel2.textContent.trim() : "Sin categoría";
 
         let arrayMateriales = [];
         vistaActual.querySelectorAll('#lista-materiales .material-item').forEach((nodo) => {
@@ -349,6 +350,7 @@ async function validarYPublicar(elemento) {
 
         try {
             const { data: { user } } = await supabase.auth.getUser();
+            if (!user) throw { code: 'sin-sesion' }; // sin sesión Supabase lo rechazaría
             const nombreUsuario = nombreVisibleDe(user) || "Anónimo";
             const fechaActual = new Date().toISOString();
 
@@ -379,23 +381,12 @@ async function validarYPublicar(elemento) {
             cacheCatalogo.clear(); // para que el producto nuevo aparezca en el catálogo
             actualizarCategoriasVisibles(); // y su categoría, si antes estaba vacía
             limpiarFormulariosCompletos();
-
-            //  Inyectamos todos los textos dinámicos para BAJO COSTE
-            const tituloExito = document.getElementById('texto-exito-publicado');
-            if (tituloExito) tituloExito.innerText = "Producto de bajo coste publicado con éxito";
-
-            const btnExito = document.getElementById('btn-volver-publicado');
-            if (btnExito) btnExito.innerText = "Subir más productos";
-
-            // Modificamos la miga de pan intermedia
-            const migaFormulario = document.getElementById('miga-tipo-formulario');
-            if (migaFormulario) migaFormulario.innerText = "Formulario producto de bajo coste";
-
-            vistaObjetivoSeleccionada = elemento.getAttribute('data-vista');
-            if (typeof realizarBusqueda === 'function') realizarBusqueda();
+            regresarvolver(2); // volvemos a "Compartir productos"
+            mostrarResultadoSubida(true, 'de bajo coste');
 
         } catch (error) {
             console.error("Error al guardar en Supabase:", error);
+            mostrarResultadoSubida(false, 'de bajo coste', error);
         } finally {
             elemento.innerText = textoOriginalBoton;
             elemento.disabled = false;
@@ -408,23 +399,22 @@ async function validarYPublicar(elemento) {
     else if (vistaActual.id === 'vista-prod-com') {
         // 1. Recopilamos los datos del formulario comercializado
         const tituloFinal = vistaActual.querySelector('.paso-columna-texto input[type="text"]').value.trim();
-        const precioFinal = document.getElementById('valor-precio-comercializado').innerText;
+        const precioFinal = formatearPrecioEuros(leerPrecioEuros(document.getElementById('precio-com-euros').value)); // p. ej. "25 €"
         const imgPrincipal = vistaActual.querySelector('.paso-columna-imagen .img-preview').src;
-        const descripcionFinal = vistaActual.querySelector('.form-row textarea').value.trim();
+        const descripcionFinal = document.getElementById('descripcion-com').value.trim();
 
         // <-- NUEVO: Recoger Categoría 1 y 2 para Comercializado
         const spanNivel1Com = document.getElementById('valor-n1-com');
-        const categoria1Final = spanNivel1Com ? spanNivel1Com.innerText.trim() : "Sin categoría";
+        const categoria1Final = spanNivel1Com ? spanNivel1Com.textContent.trim() : "Sin categoría";
 
         const spanNivel2Com = document.getElementById('valor-n2-com');
-        const categoria2Final = spanNivel2Com ? spanNivel2Com.innerText.trim() : "Sin categoría";
+        const categoria2Final = spanNivel2Com ? spanNivel2Com.textContent.trim() : "Sin categoría";
 
         const discapacidadFinal = Array.from(vistaActual.querySelectorAll('#tipo-discapacidad-com input[type="checkbox"]:checked'))
             .map(input => input.value.toLowerCase());
 
         // Recogemos el enlace
-        const textareas = vistaActual.querySelectorAll('textarea');
-        const enlaceFinal = textareas[1] ? textareas[1].value.trim() : "";
+        const enlaceFinal = document.getElementById('compra-com').value.trim();
 
         // Feedback visual en el botón
         const textoOriginalBoton = elemento.innerText;
@@ -434,6 +424,7 @@ async function validarYPublicar(elemento) {
         try {
             // 2. Enviamos a Supabase
             const { data: { user } } = await supabase.auth.getUser();
+            if (!user) throw { code: 'sin-sesion' }; // sin sesión Supabase lo rechazaría
             const nombreUsuario = nombreVisibleDe(user) || "Anónimo";
             const fechaActual = new Date().toISOString();
 
@@ -461,23 +452,12 @@ async function validarYPublicar(elemento) {
             actualizarCategoriasVisibles(); // y su categoría, si antes estaba vacía
             limpiarFormulariosCompletos();
 
-
-            //  Inyectamos todos los textos dinámicos para COMERCIALIZADO
-            const tituloExito = document.getElementById('texto-exito-publicado');
-            if (tituloExito) tituloExito.innerText = "Producto comercializado publicado con éxito";
-
-            const btnExito = document.getElementById('btn-volver-publicado');
-            if (btnExito) btnExito.innerText = "Subir más productos";
-
-            // Modificamos la miga de pan intermedia
-            const migaFormulario = document.getElementById('miga-tipo-formulario');
-            if (migaFormulario) migaFormulario.innerText = "Formulario producto comercializado";
-
-            vistaObjetivoSeleccionada = elemento.getAttribute('data-vista');
-            if (typeof realizarBusqueda === 'function') realizarBusqueda();
+            regresarvolver(2); // volvemos a "Compartir productos"
+            mostrarResultadoSubida(true, 'comercializado');
 
         } catch (error) {
             console.error("Error al guardar el producto comercializado en Supabase:", error);
+            mostrarResultadoSubida(false, 'comercializado', error);
         } finally {
             elemento.innerText = textoOriginalBoton;
             elemento.disabled = false;
@@ -701,15 +681,14 @@ function limpiarFormulariosCompletos() {
         const tituloCom = vistaCom.querySelector('.paso-columna-texto input[type="text"]');
         if (tituloCom) tituloCom.value = "";
 
-        const descCom = vistaCom.querySelector('.form-row textarea');
+        const descCom = document.getElementById('descripcion-com');
         if (descCom) descCom.value = "";
 
-        const enlaceCom = vistaCom.querySelector('.input-enlace');
+        const enlaceCom = document.getElementById('compra-com');
         if (enlaceCom) enlaceCom.value = "";
 
-        vistaCom.querySelectorAll('.contenedor-slider-filtros .btn-filtro').forEach(btn => btn.classList.remove('active-filtro'));
-        const spanPrecioCom = document.getElementById('valor-precio-comercializado');
-        if (spanPrecioCom) spanPrecioCom.innerText = "No seleccionada";
+        const precioCom = document.getElementById('precio-com-euros');
+        if (precioCom) precioCom.value = "";
 
         const previewCom = vistaCom.querySelector('.preview-container');
         const btnSubirCom = vistaCom.querySelector('.btn-subir-imagen-paso');
@@ -1211,3 +1190,79 @@ async function reenviarCodigoCorreo(boton) {
         }
     }
 }
+
+
+// =========================================================================
+// DIÁLOGO CON EL RESULTADO DE PUBLICAR UN PRODUCTO
+// =========================================================================
+insertarDialogo('modal-resultado-subida', `
+  <dialog id="modal-resultado-subida" class="modal-accesible" aria-labelledby="titulo-resultado-subida" aria-describedby="texto-resultado-subida">
+    <div class="modal-cabecera">
+      <div class="btn-cabecera-linea-modal">
+        <h2 class="btn-titulo-dialog" id="titulo-resultado-subida"></h2>
+      </div>
+      <button type="button" class="btn-cerrar-modal" aria-label="Cerrar ventana" title="Cerrar ventana" onclick="cerrarModal(this)">×</button>
+    </div>
+    <div class="modal-cuerpo">
+      <p id="texto-resultado-subida"></p>
+      <button type="button" class="btn-buscar" onclick="cerrarModal(this)">Aceptar</button>
+    </div>
+  </dialog>
+`);
+
+// Explica en palabras sencillas por qué no se ha podido subir
+function motivoErrorSubida(error) {
+    if (!error) return 'Ha ocurrido un error inesperado.';
+    if (error.code === 'sin-sesion') return 'Tu sesión ha caducado. Inicia sesión de nuevo y vuelve a publicarlo.';
+    if (error.code === '42501') return 'Tu cuenta no tiene permiso para subir productos. Avisa a las personas que gestionan la web.';
+    if (error.code === '413' || /too large|payload/i.test(error.message || '')) return 'Las imágenes ocupan demasiado. Prueba con fotos más pequeñas.';
+    if (/fetch|network/i.test(error.message || '')) return 'No hay conexión a internet. Comprueba la conexión y vuelve a intentarlo.';
+    return `No se ha podido guardar el producto (${error.message || error.code}).`;
+}
+
+function mostrarResultadoSubida(exito, tipo, error) {
+    document.getElementById('titulo-resultado-subida').textContent = exito
+        ? 'Producto publicado'
+        : 'No se ha podido publicar';
+    document.getElementById('texto-resultado-subida').textContent = exito
+        ? `Tu producto ${tipo} se ha subido correctamente. Gracias por compartir tu experiencia.`
+        : `${motivoErrorSubida(error)} Lo que has escrito no se ha borrado.`;
+    abrirModal('modal-resultado-subida');
+}
+
+// =========================================================================
+// AVISO DE CAMPOS OBLIGATORIOS SIN RELLENAR (formularios de subir producto)
+// Junto al botón "Publicar" dice cuántos campos faltan, y cada sección
+// con campos en rojo se marca también en rojo en su título.
+// Se actualiza solo según la persona va rellenando.
+// =========================================================================
+function actualizarAvisoErrores(vista) {
+    if (!vista) return;
+    const pendientes = vista.querySelectorAll('.campo-error').length;
+
+    vista.querySelectorAll('details').forEach(seccion => {
+        const titulo = seccion.querySelector('summary');
+        if (titulo) titulo.classList.toggle('seccion-con-error', !!seccion.querySelector('.campo-error'));
+    });
+
+    const zonaBoton = vista.querySelector('.buscar-espacio');
+    if (!zonaBoton) return;
+    let aviso = vista.querySelector('.aviso-campos-obligatorios');
+    if (!aviso) {
+        aviso = document.createElement('p');
+        aviso.className = 'mensaje-error-campo aviso-campos-obligatorios';
+        aviso.setAttribute('role', 'alert');
+        zonaBoton.before(aviso);
+    }
+    aviso.hidden = pendientes === 0;
+    aviso.textContent = pendientes === 1
+        ? 'Falta 1 campo obligatorio por rellenar. Está marcado en rojo.'
+        : `Faltan ${pendientes} campos obligatorios por rellenar. Están marcados en rojo.`;
+}
+
+// Al escribir o elegir algo, el campo deja de estar en rojo (ver arriba) y
+// recalculamos el aviso cuando ya se ha quitado
+['input', 'click'].forEach(tipo => document.addEventListener(tipo, evento => {
+    const vista = evento.target.closest && evento.target.closest('#vista-prod-baj, #vista-prod-com');
+    if (vista) setTimeout(() => actualizarAvisoErrores(vista), 0);
+}));

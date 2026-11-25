@@ -137,8 +137,24 @@ function actualizarDiscapacidades(sufijo) {
     const bloqueadas = [];
 
     campo.querySelectorAll('input[type="checkbox"]').forEach(input => {
-        const permitida = categoriaExisteEnWeb(cate1, cate2, input.value.toLowerCase());
         const etiqueta = input.closest('label');
+
+        // La discapacidad de esta web va siempre marcada y no se puede quitar.
+        // No se usa "disabled" para que siga llegando con el teclado y el
+        // lector de pantalla la anuncie como "marcada, no disponible".
+        if (input.value.toLowerCase() === ATLAS.discapacidad) {
+            input.checked = true;
+            input.setAttribute('aria-disabled', 'true');
+            etiqueta.title = 'Siempre marcada en esta web';
+            etiqueta.style.cursor = 'default';
+            if (!input.dataset.fija) {
+                input.dataset.fija = 'si';
+                input.addEventListener('click', evento => evento.preventDefault());
+            }
+            return;
+        }
+
+        const permitida = categoriaExisteEnWeb(cate1, cate2, input.value.toLowerCase());
         input.disabled = !permitida;
         etiqueta.style.opacity = permitida ? '' : '0.45';
         etiqueta.style.cursor = permitida ? '' : 'not-allowed';
@@ -165,3 +181,4 @@ pintarPaginasCategorias();
 dialogoCategorias('modal-categorias1', 'Elige una categoría',
     [...CATEGORIAS_WEB, CATE_OTROS].map(c => botonCategoria(c, 'seleccionarCatenivel1', 0)).join(''));
 dialogoCategorias('modal-categorias2', '', '');
+['', '-com'].forEach(marcarDiscapacidadPorDefecto);
